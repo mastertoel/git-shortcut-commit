@@ -1,0 +1,30 @@
+#!/bin/sh
+message=''
+while getopts :m: flag; do
+  case "${flag}" in
+  m) message=${OPTARG} ;;
+  *) break ;;
+  esac
+done
+currentBranch=$(git symbolic-ref --short -q HEAD)
+
+for var in "$@"; do
+  if [ "$var" != '-m' ] && [ "$var" != '--message' ] && [ "$prevVar" != '-m' ] && [ "$prevVar" != '--message' ]; then
+    otherArgs+="$var "
+  fi
+  prevVar=$var
+done
+
+if [[ $currentBranch =~ ^(chore|bug|feat)\/((ch|sc-)[0-9]+|ext)\/(.*)$ ]]; then
+  branchType="$(echo "$currentBranch" | cut -d'/' -f1)"
+  task="$(echo "$currentBranch" | cut -d'/' -f2)"
+  taskNumber="$(echo "$task" | cut -d'-' -f2)"
+  taskType="$(echo "$branchType" | sed -e 's/bug/fix/g;')"
+  defaultMessage="$(echo "$currentBranch" | rev | cut -d'/' -f1 | rev | sed -e 's/-/ /g;')"
+  commitMessage="$(echo "$taskType[sc-$taskNumber]: ${message:=$defaultMessage}" | sed -e 's/\(.\{69\}\).*/\1.../')"
+
+  git commit $otherArgs -m "$commitMessage"
+else
+  # fallback to default behavior
+  git commit $otherArgs -m "$message"
+fi
