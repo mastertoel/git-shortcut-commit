@@ -21,7 +21,11 @@ if [[ $currentBranch =~ ^(chore|bug|feat)\/((ch|sc-)[0-9]+|ext)\/(.*)$ ]]; then
   taskNumber="$(echo "$task" | cut -d'-' -f2)"
   taskType="$(echo "$branchType" | sed -e 's/bug/fix/g;')"
   defaultMessage="$(echo "$currentBranch" | rev | cut -d'/' -f1 | rev | sed -e 's/-/ /g;')"
-  commitMessage="$(echo "$taskType[sc-$taskNumber]: ${message:=$defaultMessage}" | sed -e 's/\(.\{69\}\).*/\1.../')"
+  commitMessage="$(echo "$taskType[sc-$taskNumber]: ${message:=$defaultMessage}")"
+
+  if [ ${#commitMessage} -gt 72 ]; then
+    commitMessage="$(echo "$commitMessage" | sed -e 's/\(.\{69\}\).*/\1.../')"
+  fi
 
   git commit $otherArgs -m "$commitMessage"
 else
