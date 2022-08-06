@@ -1,4 +1,7 @@
 #!/bin/sh
+
+shopt -s extglob
+
 message=''
 while getopts :m: flag; do
   case "${flag}" in
@@ -6,6 +9,7 @@ while getopts :m: flag; do
   *) break ;;
   esac
 done
+
 currentBranch=$(git symbolic-ref --short -q HEAD)
 
 for var in "$@"; do
@@ -19,7 +23,15 @@ if [[ $currentBranch =~ ^(chore|bug|feat)\/((ch|sc-)[0-9]+|ext)\/(.*)$ ]]; then
   branchType="$(echo "$currentBranch" | cut -d'/' -f1)"
   task="$(echo "$currentBranch" | cut -d'/' -f2)"
   taskNumber="$(echo "$task" | cut -d'-' -f2)"
+  if [[ $message =~ ^(.*)\[((ch|sc-)([0-9]+)|ext)\](.*)$ ]]; then
+    taskNumber=${BASH_REMATCH[4]}
+    message="$(echo "$message" | sed -E 's/\[(ch|sc-)(.*)\]//g;')"
+  fi
   taskType="$(echo "$branchType" | sed -e 's/bug/fix/g;')"
+  if [[ $message =~ ^(build|chore|ci|docs|feat|hotfix|fix|perf|refactor|revert|style|test)(.*)$ ]]; then
+    taskType=${BASH_REMATCH[1]}
+    message="$(echo "$message" | sed -E 's/^(build|chore|ci|docs|feat|hotfix|fix|perf|refactor|revert|style|test)//g;')"
+  fi
   defaultMessage="$(echo "$currentBranch" | rev | cut -d'/' -f1 | rev | sed -e 's/-/ /g;')"
   commitMessage="$(echo "$taskType[sc-$taskNumber]: ${message:=$defaultMessage}")"
 
