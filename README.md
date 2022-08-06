@@ -32,4 +32,41 @@ Additionaly
 
 Simply use `sc` instesd of `commit` with git, like
 \
-`git sc "my important change"`
+`git sc -m "my important change"`
+\
+
+### Overriding & fallback
+
+#### Fallback
+
+If your branch does not fit shortcut naming convention it will run normal `git commit`
+
+#### Override task type
+
+If you need to override task type just write it at the beginning of message, i.e.
+\
+`git sc -m "style sing in color update`
+\
+will result in
+\
+`style[sc-1234]: sing in color update`
+
+#### Override task number
+
+If you need to override task number just write it at the beginning of message, i.e.
+\
+`git sc -m "[sc-420] side fix readme type-o`
+\
+will result in
+\
+`chore[sc-420]: side fix readme type-o`
+
+#### Override both task type & number
+
+You can combine both overrides, i.e.
+\
+`git sc -m "refactor[sc-666] refactor urlManipulator`
+\
+will result in
+\
+`refactor[sc-666]: refactor urlManipulator`
