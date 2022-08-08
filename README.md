@@ -30,10 +30,12 @@ Additionaly
 
 ### How to use it?
 
-Simply use `sc` instesd of `commit` with git, like
+Simply use `sc` instead of `commit` with git, like
 \
 `git sc -m "my important change"`
 \
+\
+\* important note - you can use it with every flag that you use with "normal" `commit` command
 
 ### Overriding & fallback
 
